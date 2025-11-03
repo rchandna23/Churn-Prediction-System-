@@ -1,0 +1,63 @@
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+import boto3
+
+# ---- Step 1: Locate dataset ----
+csv_filename = "WA_Fn-UseC_-Telco-Customer-Churn.csv"
+found_path = None
+
+for root, dirs, files in os.walk("/home/ec2-user/environment"):
+    if csv_filename in files:
+        found_path = os.path.join(root, csv_filename)
+        break
+
+if not found_path:
+    print("❌ CSV file not found! Please upload 'WA_Fn-UseC_-Telco-Customer-Churn.csv' to the Cloud9 environment folder.")
+    print("💡 Tip: In the left panel, right-click 'environment' → Upload Local Files → Select the CSV file.")
+    exit(1)
+
+print(f"✅ Found dataset at: {found_path}")
+
+# ---- Step 2: Load dataset ----
+data = pd.read_csv(found_path)
+print("✅ Dataset loaded successfully.")
+
+# ---- Step 3: Data preprocessing ----
+data = data.dropna()
+data['Churn'] = data['Churn'].apply(lambda x: 1 if x == 'Yes' else 0)
+if 'customerID' in data.columns:
+    data = data.drop(['customerID'], axis=1)
+data = pd.get_dummies(data)
+print("✅ Data preprocessing complete.")
+
+# ---- Step 4: Split data ----
+X = data.drop('Churn', axis=1)
+y = data['Churn']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# ---- Step 5: Train model ----
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+print("✅ Model trained successfully!")
+
+# ---- Step 6: Evaluate model ----
+acc = model.score(X_test, y_test)
+print(f"✅ Model Accuracy: {acc*100:.2f}%")
+
+# ---- Step 7: Save model locally ----
+joblib.dump(model, "model.joblib")
+print("✅ Model saved locally as model.joblib")
+
+# ---- Step 8: Upload to S3 ----
+s3 = boto3.client("s3")
+bucket_name = "churnpredictor"  # ✅ your bucket name
+key = "model/model.joblib"
+
+try:
+    s3.upload_file("model.joblib", bucket_name, key)
+    print(f"✅ Model uploaded successfully to s3://{bucket_name}/{key}")
+except Exception as e:
+    print(f"⚠️ Could not upload to S3: {e}")
