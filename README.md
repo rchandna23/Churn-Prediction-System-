@@ -23,7 +23,9 @@ The goal is to help businesses make data-driven decisions to improve customer re
 🏗️ System Architecture
 Data Source → Data Preprocessing → Feature Engineering → Model Training → Model Evaluation → AWS Deployment → Prediction API
 🧰 Tech Stack
+
 Category	Tools & Technologies
+
 Programming Language	Python 3.x
 ML Framework	scikit-learn, pandas, numpy
 Cloud Services	AWS S3, AWS EC2, AWS Lambda, AWS SageMaker (optional)
@@ -31,6 +33,7 @@ Data Visualization	Power BI / Matplotlib / Seaborn
 Version Control	Git & GitHub
 Deployment	Flask API + AWS Lambda / EC2
 Storage	Amazon S3 Bucket
+
 ⚙️ Setup & Installation
 1️⃣ Clone the Repository
 git clone https://github.com/yourusername/Churn-Prediction-System.git
@@ -45,23 +48,15 @@ pip install -r requirements.txt
 Steps:
 
 Upload trained model (random_forest_model.pkl) to AWS S3.
-
 Deploy API using AWS Lambda and API Gateway.
-
 Optionally, use AWS EC2 or SageMaker for large-scale model training.
-
 Configure IAM roles for secure access to S3 and Lambda.
 
 🧪 Model Details
-
 Algorithm: Random Forest Classifier
-
 Reason for Selection:
-
 Handles both categorical & numerical data efficiently.
-
 Resistant to overfitting compared to decision trees.
-
 Provides high accuracy and feature importance insights.
 
 Metrics
